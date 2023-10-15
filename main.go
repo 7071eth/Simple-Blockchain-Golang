@@ -43,7 +43,14 @@ type Blockchain struct {
 var BlockChain *Blockchain
 
 func (b *Block) generateHash(){
+	fmt.Printf("\n-----------GenerateHash------------- \n")
+	fmt.Println("Prev Hash:"+b.PrevHash)
+	fmt.Println(b.Pos)
+	fmt.Println(b.TimeStamp)
+	// get string val of the Data
+	fmt.Println(b.Data)
 	bytes, _ := json.Marshal(b.Data)
+	// concatenate the dataset
 	data := string(b.Pos) + b.TimeStamp + string(bytes) + b.PrevHash
 	hash := sha256.New()
 	hash.Write([]byte(data))
@@ -51,22 +58,25 @@ func (b *Block) generateHash(){
 }
 
 func CreateBlock(prevBlock *Block, checkoutitem BookCheckout) *Block{
+	fmt.Printf("\n-----------CreateBlock------------- \n")
 	block := &Block{}
 	block.Pos = prevBlock.Pos + 1
 	block.TimeStamp = time.Now().String()
 	block.PrevHash = prevBlock.Hash
-	block.generateHash()
 	block.Data = checkoutitem
-
+	block.generateHash()
+	fmt.Println("Created new Block")
 	return block
 }
 
 func (bc *Blockchain)AddBlock(data BookCheckout){
+	fmt.Printf("\n-----------AddBlock------------- \n")
 	prevBlock :=bc.blocks[len(bc.blocks)-1]
 	block := CreateBlock(prevBlock,data)
 
 	if validBlock(block,prevBlock){
 		bc.blocks = append(bc.blocks,block)
+		fmt.Println("Valid block")
 	}
 }
 
@@ -79,6 +89,7 @@ func newBook(w http.ResponseWriter,r *http.Request){
 		w.Write([]byte("Could not create new book"))
 		return
 	}
+
 
 	h := md5.New()
 	io.WriteString(h,book.ISBN+book.PublishDate)
@@ -95,13 +106,18 @@ func newBook(w http.ResponseWriter,r *http.Request){
 }
 
 func validBlock(block,prevBlock *Block) bool {
+	fmt.Printf("\n-----------ValidBlock------------- \n")
 	if prevBlock.Hash != block.PrevHash{
+		fmt.Println("Prev Hashes doesnt match")
 		return false
 	}
+	fmt.Println(block.Hash)
 	if !block.validateHash(block.Hash){
+		fmt.Println("Invalid hash of new block")
 		return false
 	}
 	if prevBlock.Pos+1 != block.Pos{
+		fmt.Println("Invalid pos")
 		return false
 	}
 
@@ -110,6 +126,8 @@ func validBlock(block,prevBlock *Block) bool {
 
 func (b *Block) validateHash(hash string) bool {
 	b.generateHash()
+	fmt.Println(b.Hash)
+	fmt.Println(hash)
 	if b.Hash != hash{ 
 		return false
 	}
@@ -118,6 +136,8 @@ func (b *Block) validateHash(hash string) bool {
 
 
 func writeBlock(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("\n-----------WriteBlock------------- \n")
+	fmt.Printf("Check1")
 	var checkoutItem BookCheckout
 	if err := json.NewDecoder(r.Body).Decode(&checkoutItem); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -125,7 +145,9 @@ func writeBlock(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("could not write block"))
 		return
 	}
-
+	fmt.Printf("Working")
+	BlockChain.AddBlock(checkoutItem)
+	fmt.Printf(checkoutItem.User)
 	resp, err := json.MarshalIndent(checkoutItem, "", " ")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -133,7 +155,7 @@ func writeBlock(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("could not write block"))
 		return
 	}
-	w.WriteHeader(http.StatusInternalServerError)
+	w.WriteHeader(http.StatusOK)
 	w.Write(resp)
 }
 
