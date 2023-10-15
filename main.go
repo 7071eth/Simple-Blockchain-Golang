@@ -56,6 +56,7 @@ func CreateBlock(prevBlock *Block, checkoutitem BookCheckout) *Block{
 	block.TimeStamp = time.Now().String()
 	block.PrevHash = prevBlock.Hash
 	block.generateHash()
+	block.Data = checkoutitem
 
 	return block
 }
@@ -125,7 +126,6 @@ func writeBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	BlockChain.AddBlock(checkoutItem)
 	resp, err := json.MarshalIndent(checkoutItem, "", " ")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -133,7 +133,7 @@ func writeBlock(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("could not write block"))
 		return
 	}
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusInternalServerError)
 	w.Write(resp)
 }
 
@@ -177,6 +177,7 @@ func main(){
             fmt.Println()
         }
     }()
+	
 
     log.Fatal(http.ListenAndServe(":3000", r))
 }

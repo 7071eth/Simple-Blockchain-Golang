@@ -1,0 +1,24 @@
+# air.toml
+
+# Working directory (root directory of your Go project)
+root = "."
+
+[build]
+# Binary name (output file name)
+binary = "your_project_name"
+
+# Watch these file extensions for changes
+include_ext = ["go", "tpl", "tmpl", "html"]
+
+# Exclude these directories from watching
+exclude_dir = ["assets", "tmp", "vendor", "frontend"]
+
+# This will exclude .git and .idea directories, and files like .gitignore
+exclude_file = ["^\\."]
+
+# Ignored files inside an ignored directory
+exclude_file = ["^assets/ignored", "^ignored", "^excluded"]
+
+# Use inotify events. Run `go env -w GO111MODULE=on` to enable it
+# Prefer `false` in docker environment
+use_polling = false
