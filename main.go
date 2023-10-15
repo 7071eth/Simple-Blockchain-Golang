@@ -116,16 +116,25 @@ func (b *Block) validateHash(hash string) bool {
 } 
 
 
-func writeBlock(w http.ResponseWriter,r *http.Request) {
-	var checkoutitem BookCheckout 
-
-	if err := json.NewDecoder(r.Body).Decode(&checkoutitem); err != nil {
+func writeBlock(w http.ResponseWriter, r *http.Request) {
+	var checkoutItem BookCheckout
+	if err := json.NewDecoder(r.Body).Decode(&checkoutItem); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("Could not write block: %v",err)
+		log.Printf("could not write Block: %v", err)
 		w.Write([]byte("could not write block"))
+		return
 	}
 
-	BlockChain.AddBlock(checkoutitem)
+	BlockChain.AddBlock(checkoutItem)
+	resp, err := json.MarshalIndent(checkoutItem, "", " ")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("could not marshal payload: %v", err)
+		w.Write([]byte("could not write block"))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
 }
 
 func GenesisBlock() *Block{
