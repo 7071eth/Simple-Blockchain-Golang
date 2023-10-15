@@ -7,7 +7,6 @@ This is a simple implementation of a blockchain in Golang.
 - [Getting Started](#getting-started)
 - [Features](#features)
 - [Usage](#usage)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## Getting Started
@@ -31,7 +30,7 @@ Blockchain: Implements a basic blockchain with blocks linked together using cryp
 Proof of Work: Demonstrates a simple proof-of-work consensus algorithm.
 Transactions: Supports adding transactions to blocks.
 
-Usage
+##Usage
 Navigate to the project directory:
 
 go run main.go
@@ -39,5 +38,5 @@ This will start the blockchain server.
 
 Access the blockchain on http://localhost:3000 in your web browser.
 
-License
+##License
 This project is licensed under the MIT License.
